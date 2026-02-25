@@ -1,3 +1,4 @@
+/* ========== Your original styles ========== */
 body {
   margin: 0;
   padding: 40px;
@@ -5,11 +6,15 @@ body {
   background: #fcf8f6;
 }
 
-/* Title */
+/* Title with white text + black background box */
 .title {
-  color: #15267a;
+  color: white;               /* Title text white */
+  background: black;          /* Black background box */
+  padding: 10px 16px;         /* Space inside the box */
+  display: inline-block;      /* Makes the box fit the text */
+  border-radius: 6px;         /* (Optional) smooth rounded corners */
   margin-bottom: 4px;
-  font-weight: 500;
+  font-weight: 700;           /* bump weight for visual punch */
 }
 
 /* Light underline under the title */
@@ -31,13 +36,149 @@ body {
   font-size: 18px;
   color: #15267a;
   cursor: pointer;
-
-  /* Smooth transition to hover state */
-  transition: background 0.25s ease, border-color 0.25s ease;
+  transition: background 0.25s ease, border-color 0.25s ease, transform 0.2s ease, box-shadow 0.25s ease;
 }
 
 /* Hover effect */
 .main-button:hover {
   background: skyblue;        /* #87CEEB */
   border-color: mediumPurple; /* #9370DB */
+}
+
+/* ========== CHAOS EXTRAS (added) ========== */
+
+/* Animated multi-layer background for the page */
+body {
+  background:
+    radial-gradient(24px 24px at 20% 10%, rgba(0,0,0,0.03) 0 35%, transparent 36% 100%),
+    linear-gradient(135deg, rgba(0,0,0,0.02), rgba(0,0,0,0.04)),
+    conic-gradient(from 45deg at 10% 10%, rgba(255,0,128,0.06), transparent, rgba(0,128,255,0.06), transparent);
+  animation: bgFloat 18s ease-in-out infinite alternate;
+}
+@keyframes bgFloat {
+  0%   { background-position: 0 0, 0 0, 0 0; }
+  100% { background-position: 30px 20px, 20px 40px, 40px -30px; }
+}
+
+/* Glitchy title with RGB shadows */
+.title {
+  position: relative;
+  isolation: isolate;
+  text-shadow:
+    1px 0 0 rgba(255,0,0,0.6),
+    -1px 0 0 rgba(0,255,255,0.6);
+  animation: titleJitter 2.8s ease-in-out infinite;
+}
+@keyframes titleJitter {
+  0%, 100% { transform: translate(0,0) rotate(0deg); }
+  20% { transform: translate(1px,-1px) rotate(-0.5deg); }
+  40% { transform: translate(-1px,1px) rotate(0.4deg); }
+  60% { transform: translate(1px,1px) rotate(-0.3deg); }
+  80% { transform: translate(-1px,-1px) rotate(0.3deg); }
+}
+
+/* Wavy animated underline with gradient */
+.underline {
+  background: linear-gradient(90deg, #d7d7f5, #c8eaff, #87CEEB, #9370DB);
+  background-size: 300% 100%;
+  animation: underlineSweep 3.5s linear infinite;
+  height: 4px;
+  border-radius: 999px;
+}
+@keyframes underlineSweep {
+  to { background-position: 300% 0; }
+}
+
+/* Button: neon-ish border & slight wobble on hover/active */
+.main-button {
+  position: relative;
+  box-shadow:
+    0 6px 16px rgba(135,206,235,0.25),
+    inset 0 0 0 1px rgba(147,112,219,0.15);
+}
+.main-button::before {
+  content: "";
+  position: absolute;
+  inset: -3px;
+  border-radius: inherit;
+  background: conic-gradient(from 0deg, #87CEEB, #9370DB, #87CEEB);
+  filter: blur(6px);
+  opacity: 0.35;
+  z-index: -1;
+  animation: spinRing 6s linear infinite;
+}
+@keyframes spinRing { to { transform: rotate(360deg); } }
+
+.main-button:hover {
+  transform: translateY(-3px) scale(1.03) rotate(-0.3deg);
+  box-shadow:
+    0 10px 24px rgba(135,206,235,0.35),
+    0 0 0 6px rgba(147,112,219,0.10);
+}
+.main-button:active {
+  transform: translateY(0) scale(0.98) rotate(0.2deg);
+}
+
+/* CHAOS overlay & controls */
+.chaos-layer {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 999;
+}
+.chaos-controls {
+  position: fixed;
+  top: 12px;
+  right: 12px;
+  display: flex;
+  gap: 6px;
+  z-index: 1000;
+  background: rgba(0,0,0,0.65);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  padding: 6px;
+  border-radius: 10px;
+}
+.chaos-controls button {
+  pointer-events: auto;
+  background: #fff;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  cursor: pointer;
+}
+.chaos-controls button:hover { background: #f1f1f1; }
+
+.chaos-item {
+  position: absolute;
+  white-space: nowrap;
+  font-weight: 700;
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.35));
+  user-select: none;
+  mix-blend-mode: normal; /* randomized in JS */
+}
+.chaos-item.shape { font-size: 0; line-height: 0; }
+
+/* Motion keyframes used by chaos items */
+@keyframes floatY { from { transform: translateY(0); } to { transform: translateY(-40px); } }
+@keyframes floatX { from { transform: translateX(0); } to { transform: translateX(40px); } }
+@keyframes spin   { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+@keyframes drift  { 0%{ transform: translate(0,0);} 50%{ transform: translate(30px,-20px);} 100%{ transform: translate(-10px,15px);} }
+@keyframes jitter { 0%,100%{transform: translate(0,0)} 25%{transform: translate(2px,-2px)} 50%{transform: translate(-2px,2px)} 75%{transform: translate(1px,1px)} }
+@keyframes pulse  { 0%,100%{ transform: scale(1)} 50%{ transform: scale(1.12)} }
+@keyframes glitch {
+  0%{ transform: translate(0,0); filter:hue-rotate(0deg) }
+  20%{ transform: translate(2px,-2px); filter:hue-rotate(20deg) }
+  40%{ transform: translate(-2px,2px); filter:hue-rotate(-20deg) }
+  60%{ transform: translate(1px,-1px); filter:hue-rotate(10deg) }
+  80%{ transform: translate(-1px,1px); filter:hue-rotate(-10deg) }
+  100%{ transform: translate(0,0); filter:hue-rotate(0deg) }
+}
+
+/* Motion safety */
+@media (prefers-reduced-motion: reduce) {
+  .chaos-item { animation: none !important; transition: none !important; filter: none !important; }
+  .title, .underline, .main-button::before { animation: none !important; }
 }

@@ -2,79 +2,59 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Website Title</title>
-  <meta name="description" content="Industrial layout with top bars and bottom machinery." />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Evil Website</title>
+  <meta name="description" content="Minimal page with industrial background and animated geometric chaos." />
   <link rel="stylesheet" href="styles.css" />
-  <style>
-    /* Accessibility helpers */
-    :focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
-    @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
-    }
-  </style>
+  <script src="script.js" defer></script>
 </head>
 <body>
-
-  <!-- Thin page outline like the mock -->
+  <!-- Optional frame: delete this div if you want no border -->
   <div class="page-frame" aria-hidden="true"></div>
 
-  <!-- Title pill (top-left) -->
-  <header class="site-header">
-    <h1 class="title-pill">Website Title</h1>
-  </header>
-
-  <!-- Top-right decorative bars -->
-  <div class="decor" aria-hidden="true">
-    <div class="bar bar-horizontal"></div>
-    <div class="bar bar-vertical"></div>
-  </div>
-
-  <!-- Main content area intentionally sparse to match the mock -->
-  <main id="main-content" class="content" aria-label="Main content">
-    <!-- Put your future content here -->
+  <!-- Minimal center content (delete if you want a blank page) -->
+  <main class="center" aria-hidden="true">
+    <div>
+      <h1>Evil Website</h1>
+      <p>Good Luck</p>
+    </div>
   </main>
 
-  <!-- Bottom machinery band -->
-  <footer class="ground">
-    <!-- Left black “L” column with yellow/black eyes -->
-    <div class="left-column" aria-hidden="true">
-      <span class="lamp lamp-lg"></span>
-
-      <span class="arm"></span>
-      <span class="lamp lamp-sm"></span>
+  <!-- CHAOS layers -->
+  <div class="chaos" aria-hidden="true">
+    <!-- Top moving shapes -->
+    <div class="layer top">
+      <!-- Mix of shapes with sizes (xs/sm/md/lg). The script will ignore positions and animate them. -->
+      <span class="shape circle sm"></span>
+      <span class="shape triangle md"></span>
+      <span class="shape hex sm"></span>
+      <span class="shape zig md"></span>
+      <span class="shape bolt xs"></span>
+      <span class="shape rivet xs"></span>
+      <span class="shape diamond sm"></span>
+      <span class="shape nut sm"></span>
+      <span class="shape circle xs"></span>
+      <span class="shape triangle xs"></span>
+      <span class="shape plate sm"></span>
+      <span class="shape hex xs"></span>
     </div>
 
-    <!-- Row of arches across the band -->
-    <div class="arches" aria-hidden="true">
-      <div class="arch">
-        <span class="arch-hole"></span>
-        <span class="lamp lamp-md"></span>
-      </div>
-      <div class="arch">
-        <span class="arch-hole"></span>
-        <span class="lamp lamp-md"></span>
-      </div>
-      <div class="arch">
-        <span class="arch-hole"></span>
-        <span class="lamp lamp-md"></span>
-      </div>
-      <div class="arch arch-cut">
-        <span class="arch-hole"></span>
-        <span class="lamp lamp-sm"></span>
-      </div>
-    </div>
+    <!-- Subtle mid-top mist -->
+    <div class="layer mid"></div>
 
-    <!-- Right little post with small lamp -->
-    <div class="right-post" aria-hidden="true">
-      <span class="lamp lamp-sm"></span>
+    <!-- Bottom near-floor shapes -->
+    <div class="layer bottom">
+      <span class="shape bolt xs"></span>
+      <span class="shape nut  sm"></span>
+      <span class="shape plate md"></span>
+      <span class="shape zig   sm"></span>
+      <span class="shape circle sm"></span>
+      <span class="shape diamond xs"></span>
+      <span class="shape rivet xs"></span>
+      <span class="shape hex   sm"></span>
+      <span class="shape triangle xs"></span>
+      <span class="shape plate sm"></span>
     </div>
-  </footer>
-
-  <!-- Optional: year helper if you add © somewhere -->
-  <script>
-    const y = document.getElementById('year');
-    if (y) y.textContent = new Date().getFullYear();
-  </script>
+  </div>
 </body>
 </html>

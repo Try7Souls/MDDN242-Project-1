@@ -1,4 +1,4 @@
-/* ================= TOKENS / THEME ================= */
+/* Theme */
 :root{
   --bg: #eef1f4;
   --frame-line: #aeb4bb;
@@ -14,14 +14,14 @@
   --chaos-shadow: rgba(0,0,0,0.28);
   --chaos-opacity: .65;
 
-  /* NEW: trails and distortions */
+  /* Trails and distortions */
   --trail-1: rgba(0,0,0,0.22);
   --trail-2: rgba(0,0,0,0.12);
   --blur-top: 0.6px;
   --blur-bottom: 0.2px;
 }
 
-/* ================= ACCESSIBILITY ================= */
+/* Accessibility */
 :focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
@@ -30,7 +30,7 @@
   }
 }
 
-/* ================= BASE LAYOUT ================= */
+/* Base Layout */
 *, *::before, *::after { box-sizing: border-box; }
 html, body { height: 100%; }
 body{
@@ -80,13 +80,13 @@ body{
   opacity: .75;
 }
 
-/* ================= CHAOS ================= */
+/* Chaos */
 .chaos{
   position: fixed;
   inset: 0;
   pointer-events: none;
   z-index: 20;
-  /* subtle vignette to amplify chaos focus */
+  /* Subtle vignette to amplify chaos focus */
   background:
     radial-gradient(120% 100% at 50% 50%, transparent 60%, rgba(0,0,0,0.03));
 }
@@ -104,17 +104,17 @@ body{
 .shape{
   position: absolute;
   opacity: var(--chaos-opacity);
-  /* NEW: motion trail effect using layered shadows */
+  /* motion trail effect using layered shadows */
   filter:
     drop-shadow(0 2px 4px var(--chaos-shadow))
     drop-shadow(-2px -1px 0 var(--trail-2))
     drop-shadow(2px 1px 0 var(--trail-1));
   --tx: 0px; --ty: 0px;
   --scale: 1;
-  --rot: 0deg;         /* NEW rotation var from JS */
-  --skewx: 0deg;       /* NEW skew/glitch var from JS */
+  --rot: 0deg;         /* Rotation var */
+  --skewx: 0deg;       /* Skew/glitch var */
   --skewy: 0deg;
-  --flip: 1;           /* NEW mirror flip multiplier */
+  --flip: 1;           /* Mirror flip multiplier */
   transform:
     translate(var(--tx), var(--ty))
     scale(calc(var(--scale) * var(--flip)))
@@ -130,13 +130,12 @@ body{
 .md { --scale: 3.00; }
 .lg { --scale: 3.84; }
 
-/* JS mode: override CSS placement */
 body.js-chaos .shape{
   animation: none !important;
   top: 0; left: 0; right: auto; bottom: auto;
 }
 
-/* Geometries (existing) */
+/* Geometries */
 .circle{
   width: 16px; height: 16px; border-radius: 50%;
   background: radial-gradient(circle at 35% 35%, #cfd3d8 0 25%, #9aa0a6 60% 100%);
@@ -172,7 +171,6 @@ body.js-chaos .shape{
   box-shadow: inset 0 2px 2px rgba(255,255,255,0.3);
 }
 
-/* NEW: extra geometries for more chaos */
 .diamond{
   width: 16px; height: 16px;
   background: linear-gradient(145deg, #cfd3d8, #9aa0a6);
@@ -193,12 +191,6 @@ body.js-chaos .shape{
 .gear{
   width: 22px; height: 22px; border-radius: 50%;
   background: radial-gradient(circle at 40% 35%, #d7dbe0 0 35%, #9ea3aa 65% 100%);
-  border: 2px solid var(--ink);
-  /* teeth illusion */
-  box-shadow:
-    0 0 0 3px var(--ink),
-    0 0 0 4px #b9bec4,
-    0 0 0 5px var(--ink);
   clip-path: polygon(
     50% 0%, 60% 6%, 70% 0%, 76% 10%, 88% 8%,
     90% 20%, 100% 24%, 94% 34%, 100% 46%,
@@ -213,10 +205,10 @@ body.js-chaos .shape{
   width: 18px; height: 28px;
   background: linear-gradient(160deg, #e0e4e9, #9aa0a6);
   clip-path: polygon(20% 0, 80% 8%, 90% 40%, 70% 100%, 10% 80%, 0 20%);
-  border: 2px solid var(--ink);
+
 }
 
-/* NEW: glitch visual (briefly applied via JS) */
+/* glitch visual */
 .shape.glitch{
   filter:
     drop-shadow(0 2px 4px var(--chaos-shadow))
@@ -225,13 +217,13 @@ body.js-chaos .shape{
   opacity: 0.85;
 }
 
-/* ================= RESPONSIVE ================= */
+
 @media (max-width: 640px){
   .center h1{ font-size: 22px; }
   .center p{ font-size: 14px; }
 }
 
-/* ============== CHAOS HUD (overlay controls) ============== */
+
 :root{
   --hud-bg: rgba(245, 247, 250, 0.74);
   --hud-border: #aeb4bb;

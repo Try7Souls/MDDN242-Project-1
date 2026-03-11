@@ -1,10 +1,8 @@
-// script.js — Chaos HUD (self-contained) with bigger max values
-// Changes: higher SPEED_MAX, speed slider max 2.5, step cap 18, higher glitch/burst limits, wider Randomize.
+// Chaos HUD with max values
 (() => {
   const CHAOS_CONTAINER = document.querySelector('.chaos');
   if (!CHAOS_CONTAINER) return;
 
-  // ===== Inject HUD CSS + transform/glitch helpers (no external CSS needed) =====
   const HUD_CSS = `
   /* HUD panel */
   #chaos-hud{
@@ -61,29 +59,29 @@
   styleTag.textContent = HUD_CSS;
   document.head.appendChild(styleTag);
 
-  // ===== Accessibility: respect reduced motion by default =====
+  // Reduce motion
   const MEDIA_REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)');
   let systemReduced = MEDIA_REDUCED.matches;
-  let overrideReduced = false; // HUD toggle
-  let paused = false;          // HUD toggle
+  let overrideReduced = false; // Hud toggle
+  let paused = false;         
 
   document.body.classList.add('js-chaos');
 
-  // ===== Motion tuning (bigger max, still guarded) =====
+  // Motion tuning
   const MARGIN = 8;
-  const SPEED_MIN = 90;   // px/sec baseline
-  const SPEED_MAX = 800;  // ⬆ raised max speed ceiling
-  const NUDGE = 0.06;     // gentler bounce desync
-  const MAX_STEP = 18;    // ⬆ px/frame cap to allow higher top speed without warp
+  const SPEED_MIN = 90;   
+  const SPEED_MAX = 800;  
+  const NUDGE = 0.06;     
+  const MAX_STEP = 18;    
 
-  // Glitch & burst defaults (tweakable in HUD)
-  let glitchChance = 0.003;      // per-shape per second
-  let burstChance  = 0.004;      // per-shape per second
-  const SKEW_MAX = 4;            // deg during glitch
-  const GLITCH_MIN = 0.08, GLITCH_MAX = 0.18; // seconds
-  const BURST_MIN = 0.20, BURST_MAX = 0.45;   // seconds
-  const BURST_BOOST_MIN = 1.2, BURST_BOOST_MAX = 1.7; // ⬆ slightly higher boost
-  let wrapMode = false;          // HUD toggle
+  // Glitch and burst 
+  let glitchChance = 0.003;     
+  let burstChance  = 0.004;      
+  const SKEW_MAX = 4;          
+  const GLITCH_MIN = 0.08, GLITCH_MAX = 0.18; 
+  const BURST_MIN = 0.20, BURST_MAX = 0.45;   
+  const BURST_BOOST_MIN = 1.2, BURST_BOOST_MAX = 1.7; 
+  let wrapMode = false;         
 
   // Viewport
   let vw = window.innerWidth;
@@ -92,19 +90,18 @@
   // Shapes
   const shapes = Array.from(CHAOS_CONTAINER.querySelectorAll('.shape'));
 
-  // ===== Speed control (non-linear slider mapping) =====
-  // Wider slider top end; cubic mapping keeps the mid-range usable.
-  let speedMult = 1.0; // effective multiplier after curve
+  // Speed control
+  let speedMult = 1.0; 
   const sliderMin = 0.25;
-  const sliderMax = 2.5; // ⬆ wider max
+  const sliderMax = 2.5; 
 
   const speedLinearToCurve = (v) => {
-    const t = (v - sliderMin) / (sliderMax - sliderMin); // 0..1
-    const eased = t * t * t; // cubic ease-in
+    const t = (v - sliderMin) / (sliderMax - sliderMin); 
+    const eased = t * t * t; 
     return sliderMin + eased * (sliderMax - sliderMin);
   };
 
-  // ===== Movers (per-shape state) =====
+  // Movers
   const movers = shapes.map(el => {
     const r = el.getBoundingClientRect();
     const w = r.width || 20;
@@ -118,32 +115,32 @@
     let vx = Math.cos(theta) * speed;
     let vy = Math.sin(theta) * speed;
 
-    // glitch/burst state per-shape
+    // Glitch/burst per shape
     let glitchTimer = 0;
     let burstTimer = 0;
     let skewx = 0, skewy = 0;
-    let rot = 0; // reserved for potential wobble/rotation
+    let rot = 0; 
 
     setVars(el, x, y, skewx, skewy, rot);
     return { el, w, h, x, y, vx, vy, glitchTimer, burstTimer, skewx, skewy, rot };
   });
 
-  // ===== Animation =====
+  // Animation
   let animEnabled = !(systemReduced && !overrideReduced);
   let last = performance.now();
   let rafId = 0;
 
-  // FPS monitor (lightweight)
+  // FPS monitor
   let fps = 0, acc = 0, cnt = 0, lastFpsUpdate = performance.now();
 
   function frame(now) {
-    const dt = Math.min(0.05, (now - last) / 1000) || 0.016; // stability cap
+    const dt = Math.min(0.05, (now - last) / 1000) || 0.016; 
     last = now;
 
     // FPS calc
     const inst = 1 / dt;
     acc += inst; cnt++;
-    if (now - lastFpsUpdate > 120) { // update ~8x/sec
+    if (now - lastFpsUpdate > 120) { 
       fps = Math.round(acc / cnt);
       acc = 0; cnt = 0; lastFpsUpdate = now;
       updateHudFPS(fps);
@@ -151,7 +148,7 @@
 
     if (animEnabled && !paused) {
       for (const m of movers) {
-        // ===== Guarded integration with per-frame step cap =====
+        // Guarded integration with per-frame step cap 
         const vxEff = m.vx * speedMult;
         const vyEff = m.vy * speedMult;
         let dx = vxEff * dt;
@@ -166,7 +163,7 @@
         m.x += dx;
         m.y += dy;
 
-        // ===== Edge handling =====
+        // Edge handling
         if (!wrapMode) {
           // Bounce edges
           if (m.x <= MARGIN) {
@@ -191,7 +188,7 @@
           else if (m.y > vh + MARGIN) m.y = -m.h - MARGIN;
         }
 
-        // ===== Random burst (gentle, but higher ceiling) =====
+        // Random burst of speed
         if (Math.random() < burstChance * dt * 60) {
           m.burstTimer = rand(BURST_MIN, BURST_MAX);
           const boost = rand(BURST_BOOST_MIN, BURST_BOOST_MAX);
@@ -200,12 +197,11 @@
         if (m.burstTimer > 0) {
           m.burstTimer -= dt;
           if (m.burstTimer <= 0) {
-            // ease back a bit
             m.vx *= 0.7; m.vy *= 0.7;
           }
         }
 
-        // ===== Glitch skew (brief) =====
+        // Glitch speed
         if (Math.random() < glitchChance * dt * 60) {
           m.glitchTimer = rand(GLITCH_MIN, GLITCH_MAX);
           m.el.classList.add('glitch');
@@ -229,7 +225,7 @@
 
   rafId = requestAnimationFrame(frame);
 
-  // ===== Resize handling =====
+  // Resize handling
   window.addEventListener('resize', () => {
     vw = window.innerWidth;
     vh = window.innerHeight;
@@ -242,7 +238,7 @@
     }
   }, { passive: true });
 
-  // ===== Reduced motion changes =====
+  // Reduced motion
   if (MEDIA_REDUCED.addEventListener) {
     MEDIA_REDUCED.addEventListener('change', (e) => {
       systemReduced = e.matches;
@@ -260,7 +256,7 @@
   }
   function recomputeAnimEnabled(){ animEnabled = !(systemReduced && !overrideReduced); }
 
-  // ===== Utilities =====
+  // Utilities
   function rand(min, max){ return Math.random() * (max - min) + min; }
   function clamp(v, a, b){ return Math.max(a, Math.min(b, v)); }
   function setVars(el, x, y, skewx=0, skewy=0, rot=0){
@@ -287,7 +283,7 @@
     }
   }
 
-  // ======== HUD (higher max values) ========
+  // Hud
   buildHUD();
   updateHudReducedNote();
   updateHudPlayState();
@@ -303,12 +299,11 @@
         <div class="hud-title">Chaos HUD</div>
         <div class="hud-meta">
           <span id="hud-fps">FPS: —</span>
-          <button type="button" id="hud-hide" title="Hide HUD (H)">Hide</button>
         </div>
       </div>
       <div class="hud-body">
         <div class="row">
-          <label for="ovr">Override reduced motion</label>
+          <label for="ovr">You wouldn't check it</label>
           <input id="ovr" type="checkbox" />
           <div class="sub" id="reduced-note"></div>
         </div>
@@ -327,7 +322,7 @@
         </div>
 
         <div class="row">
-          <label for="burst">Burst chance</label>
+          <label for="burst">Accelerate</label>
           <input id="burst" type="range" min="0" max="0.04" step="0.001" value="${burstChance}">
           <div class="val" id="burst-val">${burstChance.toFixed(3)}</div>
           <div class="sub">Probability per shape per second of a short speed boost.</div>
@@ -336,7 +331,8 @@
         <div class="row">
           <label for="wrap">Wrap edges</label>
           <input id="wrap" type="checkbox" />
-          <div class="sub">Off = bounce; On = wrap around screen edges.</div>
+          <div class="sub">Off = bounce.</div>
+          <div class="sub">On = wrap around screen edges.</div>
         </div>
 
         <div class="btns">
@@ -353,10 +349,10 @@
     `;
     document.body.appendChild(hud);
 
-    // Drag to move (header is the handle)
+    // Drag to move
     enableDrag(hud.querySelector('.hud-header'), hud);
 
-    // Wire up controls
+    // Controls
     const speed = hud.querySelector('#speed');
     const speedVal = hud.querySelector('#speed-val');
     const wrap = hud.querySelector('#wrap');
@@ -366,7 +362,7 @@
     const burst = hud.querySelector('#burst');
     const burstVal = hud.querySelector('#burst-val');
 
-    // Initialize effective speed (apply curve to initial slider value)
+    // Initialize effective speed
     const initialRaw = parseFloat(speed.value) || 1.0;
     const eff = speedLinearToCurve(initialRaw);
     speedMult = eff;
@@ -401,23 +397,22 @@
     document.getElementById('btn-pause').addEventListener('click', () => { paused = true; updateHudPlayState(); });
     document.getElementById('btn-resume').addEventListener('click', () => { paused = false; updateHudPlayState(); });
 
-    // New: Randomize button (wider ranges to use the new max values)
+    // Randomize button
     document.getElementById('btn-randomize').addEventListener('click', () => {
       randomizeSettings({ speed, speedVal, glitch, glitchVal, burst, burstVal, wrap });
     });
 
-    // Hide/show HUD via button or 'H'
-    document.getElementById('hud-hide').addEventListener('click', () => { hud.hidden = true; });
+    // Hide/show Hud (press H)
     window.addEventListener('keydown', (e) => {
       if (e.key.toLowerCase() === 'h') hud.hidden = !hud.hidden;
     }, { passive: true });
   }
 
-  // Randomize controls with wider bounds, apply, and lightly reseed directions
+  // Randomize controls
   function randomizeSettings(refs){
     const { speed, speedVal, glitch, glitchVal, burst, burstVal, wrap } = refs;
 
-    // Wider but still sane (thanks to MAX_STEP guard)
+    // Wider but still sane
     const randSpeedRaw = clamp(rand(0.6, 2.5), sliderMin, sliderMax);
     const randGlitch = clamp(rand(0.000, 0.025), 0, 0.03);
     const randBurst  = clamp(rand(0.000, 0.035), 0, 0.04);
@@ -440,7 +435,6 @@
     wrap.checked = randWrap;
     wrapMode = randWrap;
 
-    // Light reseed (directions & speeds) without reposition to keep the composition
     reseed(false);
   }
 
@@ -468,7 +462,7 @@
     r.disabled = !paused || disabledBySystem;
   }
 
-  // Basic draggable HUD (header drag)
+  // Draggable HUD
   function enableDrag(handle, panel){
     let sx=0, sy=0, ox=0, oy=0, dragging=false;
     handle.addEventListener('pointerdown', (e) => {
@@ -497,16 +491,12 @@
   }
 })();
 
-/* =========================================================
-   Random Square Pop-up (dismissible with top-right ✕)
-   – Paste this at the END of your current script.js
-   – No dependencies; styles injected automatically
-   ========================================================= */
+   // Random Pop-up
+
 (() => {
   const MEDIA_REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)');
   const REDUCED = MEDIA_REDUCED.matches;
 
-  // ----- Inject minimal CSS -----
   const CSS = `
   .chaos-popup {
     position: fixed;
@@ -570,13 +560,13 @@
   style.textContent = CSS;
   document.head.appendChild(style);
 
-  const MIN_MS = 8000;   // min interval between spawns
-  const MAX_MS = 18000;  // max interval between spawns
-  const MIN_SIZE = 120;  // px (square)
-  const MAX_SIZE = 260;  // px (square)
+  const MIN_MS = 8000;   
+  const MAX_MS = 18000;  
+  const MIN_SIZE = 120;  
+  const MAX_SIZE = 260;  
   let spawnTimer = 0;
 
-  const popups = []; // track to support Esc-close of last/topmost
+  const popups = []; 
 
   function rand(min, max){ return Math.random() * (max - min) + min; }
   function clamp(v, a, b){ return Math.max(a, Math.min(b, v)); }
@@ -584,7 +574,6 @@
   function spawnPopup(){
     const size = Math.round(rand(MIN_SIZE, MAX_SIZE));
 
-    // Keep fully visible within viewport
     const vw = window.innerWidth;
     const vh = window.innerHeight;
     const maxLeft = Math.max(0, vw - size - 10);
@@ -613,13 +602,11 @@
     // Close on ✕
     el.querySelector('.chaos-popup__x').addEventListener('click', () => closePopup(el));
 
-    // Optional: close on dblclick the bar
-    el.querySelector('.chaos-popup__bar').addEventListener('dblclick', () => closePopup(el));
+    el.querySelector('.chaos-popup__bar').addEventListener('click', () => closePopup(el));
 
-    // Draggable via title bar
+    // Draggable pop up
     enableDrag(el.querySelector('.chaos-popup__bar'), el);
 
-    // Add to DOM & stack tracker
     document.body.appendChild(el);
     popups.push(el);
   }
@@ -637,14 +624,14 @@
     }
   });
 
-  // Manual spawn: Shift + P (useful for testing)
+  // Manual spawn Shift + P (useful for testing)
   window.addEventListener('keydown', (e) => {
     if (e.shiftKey && (e.key.toLowerCase?.() === 'p')) {
       spawnPopup();
     }
   });
 
-  // Auto-spawn loop
+  // Auto pop up loop
   function scheduleNext(){
     const next = Math.round(rand(MIN_MS, MAX_MS));
     clearTimeout(spawnTimer);
@@ -673,7 +660,6 @@
     }
   }, { passive: true });
 
-  // Simple draggable behavior using the header as the handle
   function enableDrag(handle, panel){
     let dragging = false;
     let startX=0, startY=0, left0=0, top0=0;

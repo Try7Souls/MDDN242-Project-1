@@ -1,28 +1,33 @@
 /* ================= TOKENS / THEME ================= */
 :root{
-  /* Background + frame (kept/enhanced) */
   --bg: #eef1f4;
   --frame-line: #aeb4bb;
 
-  /* Palette for industrial chaos */
-  --ink: #0a0a0f;           /* near-black metal */
-  --bar-dark: #6e6a70;      /* steel grey for accents */
+  --ink: #0a0a0f;
+  --bar-dark: #6e6a70;
 
-  /* Metal shading */
   --metal-1: #cdd1d6;
   --metal-2: #9ea3aa;
   --metal-3: #8f949b;
   --metal-4: #5b5e63;
 
-  /* Chaos tuning */
   --chaos-shadow: rgba(0,0,0,0.28);
-  --chaos-opacity: .65;        /* global visibility of bits */
+  --chaos-opacity: .65;
+
+  /* NEW: trails and distortions */
+  --trail-1: rgba(0,0,0,0.22);
+  --trail-2: rgba(0,0,0,0.12);
+  --blur-top: 0.6px;
+  --blur-bottom: 0.2px;
 }
 
 /* ================= ACCESSIBILITY ================= */
 :focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 /* ================= BASE LAYOUT ================= */
@@ -32,21 +37,17 @@ body{
   margin: 0;
   font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
 
-  /* ======= preserved industrial background ======= */
   background:
-    /* fine industrial noise & light falloff */
     radial-gradient(100% 100% at 0% 0%, rgba(255,255,255,0.36), transparent 60%),
     radial-gradient(120% 120% at 100% 10%, rgba(0,0,0,0.04), transparent 70%),
     repeating-linear-gradient(135deg, rgba(0,0,0,0.02) 0 2px, rgba(255,255,255,0.02) 2px 4px),
     var(--bg);
   color: #111;
 
-  /* stacking context for chaos layers */
   position: relative;
   overflow: hidden;
 }
 
-/* Optional: subtle page frame (delete if you want truly blank edges) */
 .page-frame{
   position: fixed;
   inset: 6px;
@@ -55,7 +56,6 @@ body{
   z-index: 50;
 }
 
-/* Minimal center content (delete if you want a blank page) */
 .center{
   position: relative;
   z-index: 10;
@@ -85,58 +85,68 @@ body{
   position: fixed;
   inset: 0;
   pointer-events: none;
-  z-index: 20; /* above bg, below frame/center text */
+  z-index: 20;
+  /* subtle vignette to amplify chaos focus */
+  background:
+    radial-gradient(120% 100% at 50% 50%, transparent 60%, rgba(0,0,0,0.03));
 }
-.mid{
-  top: 16vh; height: 22vh; opacity: .35;
+.layer.top { filter: blur(var(--blur-top)); }
+.layer.mid { top: 16vh; height: 22vh; opacity: .35;
   background:
     radial-gradient(120px 60px at 82% 18%, rgba(0,0,0,0.06), transparent 70%),
     radial-gradient(180px 80px at 56% 54%, rgba(255,255,255,0.06), transparent 70%),
     radial-gradient(140px 70px at 92% 64%, rgba(0,0,0,0.05), transparent 70%);
   filter: blur(.3px);
 }
-.bottom{
-  bottom: 0; height: 190px;
-  align-self: end;
-}
+.layer.bottom{ bottom: 0; height: 190px; align-self: end; filter: blur(var(--blur-bottom)); }
 
-/* Shape base: JS drives translate via CSS vars; scale via --scale */
+/* Shape base */
 .shape{
   position: absolute;
   opacity: var(--chaos-opacity);
-  filter: drop-shadow(0 2px 4px var(--chaos-shadow));
-  --tx: 0px; --ty: 0px;        /* JS sets these */
-  --scale: 1;                  /* size set by class */
-  transform: translate(var(--tx), var(--ty)) scale(var(--scale)) translateZ(0);
-  will-change: transform;
+  /* NEW: motion trail effect using layered shadows */
+  filter:
+    drop-shadow(0 2px 4px var(--chaos-shadow))
+    drop-shadow(-2px -1px 0 var(--trail-2))
+    drop-shadow(2px 1px 0 var(--trail-1));
+  --tx: 0px; --ty: 0px;
+  --scale: 1;
+  --rot: 0deg;         /* NEW rotation var from JS */
+  --skewx: 0deg;       /* NEW skew/glitch var from JS */
+  --skewy: 0deg;
+  --flip: 1;           /* NEW mirror flip multiplier */
+  transform:
+    translate(var(--tx), var(--ty))
+    scale(calc(var(--scale) * var(--flip)))
+    rotate(var(--rot))
+    skew(var(--skewx), var(--skewy))
+    translateZ(0);
+  will-change: transform, opacity, filter;
 }
 
-/* 3× sizes via scale variable (instead of overriding transform) */
+/* Sizes via variable */
 .xs { --scale: 2.10; }
 .sm { --scale: 2.64; }
 .md { --scale: 3.00; }
 .lg { --scale: 3.84; }
 
-/* When JS runs, disable any old CSS keyframes & neutralize positions */
+/* JS mode: override CSS placement */
 body.js-chaos .shape{
   animation: none !important;
-  top: 0; left: 0; right: auto; bottom: auto; /* JS takes over placement */
+  top: 0; left: 0; right: auto; bottom: auto;
 }
 
-/* Geometries */
+/* Geometries (existing) */
 .circle{
   width: 16px; height: 16px; border-radius: 50%;
   background: radial-gradient(circle at 35% 35%, #cfd3d8 0 25%, #9aa0a6 60% 100%);
   border: 2px solid var(--ink);
 }
-
-
 .triangle{
   width: 0; height: 0;
   border-left: 10px solid transparent;
   border-right: 10px solid transparent;
   border-bottom: 16px solid var(--metal-4);
-  filter: drop-shadow(0 2px 4px var(--chaos-shadow));
 }
 .hex{
   width: 20px; height: 18px;
@@ -155,8 +165,6 @@ body.js-chaos .shape{
   background: linear-gradient(180deg, var(--metal-1), var(--metal-3));
   border: 2px solid var(--ink);
 }
-
-
 .rivet{
   width: 10px; height: 10px; border-radius: 50%;
   background: radial-gradient(circle at 30% 30%, #eceff2 0 20%, #b8bdc3 60% 100%);
@@ -164,11 +172,163 @@ body.js-chaos .shape{
   box-shadow: inset 0 2px 2px rgba(255,255,255,0.3);
 }
 
-/* (We no longer need CSS keyframes; JS animates everything)
-   Keeping media query above to respect reduced motion. */
+/* NEW: extra geometries for more chaos */
+.diamond{
+  width: 16px; height: 16px;
+  background: linear-gradient(145deg, #cfd3d8, #9aa0a6);
+  clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+  border: 2px solid var(--ink);
+}
+.nut{
+  width: 18px; height: 18px;
+  background: linear-gradient(#b8bec5, #8d939a);
+  clip-path: polygon(25% 0, 75% 0, 100% 25%, 100% 75%, 75% 100%, 25% 100%, 0 75%, 0 25%);
+  border: 2px solid var(--ink);
+}
+.bolt{
+  width: 6px; height: 24px; border-radius: 2px;
+  background: linear-gradient(180deg, #d4d8dc, #8f949b);
+  border: 2px solid var(--ink);
+}
+.gear{
+  width: 22px; height: 22px; border-radius: 50%;
+  background: radial-gradient(circle at 40% 35%, #d7dbe0 0 35%, #9ea3aa 65% 100%);
+  border: 2px solid var(--ink);
+  /* teeth illusion */
+  box-shadow:
+    0 0 0 3px var(--ink),
+    0 0 0 4px #b9bec4,
+    0 0 0 5px var(--ink);
+  clip-path: polygon(
+    50% 0%, 60% 6%, 70% 0%, 76% 10%, 88% 8%,
+    90% 20%, 100% 24%, 94% 34%, 100% 46%,
+    90% 50%, 100% 56%, 92% 66%, 88% 78%,
+    76% 76%, 72% 90%, 60% 86%, 50% 100%,
+    40% 86%, 28% 90%, 24% 76%, 12% 78%,
+    8% 66%, 0% 56%, 10% 50%, 0% 46%,
+    6% 34%, 0% 24%, 10% 20%, 12% 8%, 24% 10%, 30% 0%
+  );
+}
+.shard{
+  width: 18px; height: 28px;
+  background: linear-gradient(160deg, #e0e4e9, #9aa0a6);
+  clip-path: polygon(20% 0, 80% 8%, 90% 40%, 70% 100%, 10% 80%, 0 20%);
+  border: 2px solid var(--ink);
+}
+
+/* NEW: glitch visual (briefly applied via JS) */
+.shape.glitch{
+  filter:
+    drop-shadow(0 2px 4px var(--chaos-shadow))
+    drop-shadow(-6px 0 0 rgba(0,255,255,0.25))
+    drop-shadow(6px 0 0 rgba(255,0,255,0.25));
+  opacity: 0.85;
+}
 
 /* ================= RESPONSIVE ================= */
 @media (max-width: 640px){
   .center h1{ font-size: 22px; }
   .center p{ font-size: 14px; }
+}
+
+/* ============== CHAOS HUD (overlay controls) ============== */
+:root{
+  --hud-bg: rgba(245, 247, 250, 0.74);
+  --hud-border: #aeb4bb;
+  --hud-text: #111;
+  --hud-accent: #0a0a0f;
+  --hud-muted: #6e6a70;
+  --hud-focus: #0a0a0f;
+}
+
+#chaos-hud{
+  position: fixed;
+  top: 12px; right: 12px;
+  z-index: 9999;
+  pointer-events: auto;
+  color: var(--hud-text);
+  background: var(--hud-bg);
+  border: 1px solid var(--hud-border);
+  border-radius: 12px;
+  backdrop-filter: blur(6px);
+  box-shadow: 0 8px 22px rgba(0,0,0,.18);
+  width: 320px;
+  max-width: calc(100vw - 24px);
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  font-size: 12px;
+}
+
+#chaos-hud[hidden]{ display: none !important; }
+
+#chaos-hud .hud-header{
+  display: flex; align-items: center; gap: 8px;
+  justify-content: space-between;
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--hud-border);
+  cursor: move;
+  user-select: none;
+}
+#chaos-hud .hud-title{
+  font-weight: 700; letter-spacing: .02em;
+}
+#chaos-hud .hud-meta{
+  display: flex; align-items: center; gap: 8px; color: var(--hud-muted);
+}
+#chaos-hud .hud-body{
+  padding: 10px; max-height: 70svh; overflow: auto;
+}
+
+#chaos-hud .row{
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px 10px;
+  align-items: center;
+  margin-bottom: 10px;
+}
+#chaos-hud .row label{
+  font-weight: 600;
+}
+#chaos-hud .sub{
+  grid-column: 1 / -1;
+  color: var(--hud-muted);
+  margin-top: -6px; margin-bottom: 2px;
+  font-size: 11px;
+}
+
+#chaos-hud input[type="range"]{
+  width: 100%;
+  accent-color: var(--hud-accent);
+}
+#chaos-hud input[type="checkbox"]{
+  accent-color: var(--hud-accent);
+}
+#chaos-hud .val{
+  min-width: 44px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#chaos-hud .btns{
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 6px;
+}
+#chaos-hud button{
+  padding: 6px 8px;
+  border-radius: 9px;
+  border: 1px solid var(--hud-border);
+  background: white;
+  cursor: pointer;
+  font-weight: 600;
+}
+#chaos-hud button:hover{ filter: brightness(0.98); }
+#chaos-hud button:active{ transform: translateY(1px); }
+
+#chaos-hud .footer{
+  display: flex; justify-content: space-between; align-items: center;
+  margin-top: 8px; color: var(--hud-muted);
+}
+
+/* Keyboard focus */
+#chaos-hud :focus-visible{
+  outline: 2px solid var(--hud-focus);
+  outline-offset: 2px;
 }

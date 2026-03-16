@@ -2,63 +2,43 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Evil Website</title>
-  <meta name="description" content="Industrial background with animated geometric chaos, now more chaotic." />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Chaos Mode</title>
+  <meta name="description" content="Chaos layer with fast moving items, edge-bounce physics, a moving About Me link, stationary popups, and blinking respawns." />
+
+  <!-- Styles -->
   <link rel="stylesheet" href="styles.css" />
-  <script src="script.js" defer></script>
+
+  <style>
+    /* Accessibility helper for keyboard users */
+    :focus-visible {
+      outline: 2px solid currentColor;
+      outline-offset: 2px;
+    }
+    /* Respect users who prefer less motion */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
 </head>
 <body>
-  <!-- Frame -->
-  <div class="page-frame" aria-hidden="true"></div>
 
-  <!-- Title -->
-  <main class="center" aria-hidden="true">
-    <div>
-      <h1>Evil Website</h1>
-      <p>Have Fun</p>
-    </div>
+  <header>
+    <h1 class="title">Basic Website!</h1>
+  </header>
+
+  <!-- Main area -->
+  <main id="main-content">
+    <div class="underline" aria-hidden="true"></div>
   </main>
 
+  <!-- CHAOS overlay (clickable 'About Me' needs pointer-events enabled selectively) -->
+  <div class="chaos-layer" id="chaosLayer" aria-hidden="true"></div>
 
-  <div class="chaos" aria-hidden="true">
-
-    <div class="layer top">
-    <!-- shapes -->
-      <span class="shape circle sm"></span>
-      <span class="shape triangle md"></span>
-      <span class="shape hex sm"></span>
-      <span class="shape zig md"></span>
-      <span class="shape bolt xs"></span>
-      <span class="shape rivet xs"></span>
-      <span class="shape diamond sm"></span>
-      <span class="shape nut sm"></span>
-      <span class="shape circle xs"></span>
-      <span class="shape triangle xs"></span>
-      <span class="shape plate sm"></span>
-      <span class="shape hex xs"></span>
-      <span class="shape gear sm"></span>
-      <span class="shape shard xs"></span>
-      <span class="shape plate lg"></span>
-      <span class="shape rivet sm"></span>
-    </div>
-
-    <div class="layer mid"></div>
-
-    <div class="layer bottom">
-      <span class="shape bolt xs"></span>
-      <span class="shape nut  sm"></span>
-      <span class="shape plate md"></span>
-      <span class="shape zig   sm"></span>
-      <span class="shape circle sm"></span>
-      <span class="shape diamond xs"></span>
-      <span class="shape rivet xs"></span>
-      <span class="shape hex   sm"></span>
-      <span class="shape triangle xs"></span>
-      <span class="shape plate sm"></span>
-      <span class="shape gear xs"></span>
-      <span class="shape shard sm"></span>
-    </div>
-  </div>
+  <!-- Logic -->
+  <script src="script.js"></script>
 </body>
 </html>

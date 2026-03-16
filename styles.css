@@ -156,3 +156,88 @@ body {
   .chaos-item { animation: none !important; transition: none !important; filter: none !important; }
   .title, .underline { animation: none !important; }
 }
+/* ✅ Jumpscare overlay */
+.jumpscare {
+  position: fixed;
+  inset: 0;
+  background: black;
+  z-index: 999999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.jumpscare img {
+  width: 200vmin;
+  height: auto;
+  animation: jumpscareFlash 0.05s steps(2) infinite;
+}
+
+/* ------------------------------------
+   ✅ CAMERA EVENT SYSTEM
+------------------------------------ */
+#cameraEventLayer {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9000;
+}
+
+/* The camera icon that appears */
+.camera-popup {
+  position: fixed;
+  font-size: 128px;
+  width: 140px;
+  height: 140px;
+  cursor: pointer;
+  pointer-events: auto;
+  z-index: 9998;
+  transition: 0.25s ease;
+  filter: drop-shadow(0 6px 12px rgba(0,0,0,0.4));
+  animation: cameraPulse 1.4s ease-in-out infinite
+}
+
+/* Flash effect */
+.screen-flash {
+  position: fixed;
+  inset: 0;
+  background: white;
+  opacity: 1;
+  z-index: 99999;
+  pointer-events: none;
+  animation: flashFade 0.6s ease-out forwards;
+}
+
+@keyframes flashFade {
+  0% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* Image shown after clicking the camera */
+.reveal-image {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 99995;
+  pointer-events: none;
+  animation: revealFade 3s ease-out forwards;
+}
+
+.reveal-image img {
+  max-width: 80vw;
+  max-height: 80vh;
+}
+
+@keyframes revealFade {
+  0% { opacity: 1; }
+  95% { opacity: 1; }
+  100% { opacity: 0; }
+}
+@keyframes cameraPulse {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(1.14); }
+  100% { transform: scale(1); }
+}

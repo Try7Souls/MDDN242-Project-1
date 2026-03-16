@@ -12,8 +12,8 @@
   const SPEED_MAX = 420;  // px/s
 
   // Stationary popups: no limit, spawn faster
-  const POPUP_MIN_MS = 2000;
-  const POPUP_MAX_MS = 4000;
+  const POPUP_MIN_MS = 6000;
+  const POPUP_MAX_MS = 10000;
   // no POPUP_MAX cap
 
   // Blink cycle for chaos items (disappear + respawn)
@@ -243,6 +243,7 @@
     box.appendChild(close);
     box.appendChild(body);
     document.body.appendChild(box);
+    makeDraggable(box);
 
     // Place once, do not move
     const { w: bw, h: bh } = bounds();
@@ -378,6 +379,13 @@
     populateChaos(randInt(CHAOS_MIN, CHAOS_MAX));
     wireShortcuts();
 
+    // ✅ 1/1000 chance every 1 second
+setInterval(() => {
+  if (Math.random() < 0.010) {   // 0.1% = 1/1000 chance
+    triggerJumpScare();
+  }
+}, 1000);
+  
     if (!prefersReduced) {
    
       // Then continuous spawning
@@ -400,3 +408,124 @@
     });
   });
 })();
+
+// ✅ Make a popup draggable
+function makeDraggable(el) {
+  let offsetX = 0, offsetY = 0;
+  let isDown = false;
+
+  const onMouseDown = (e) => {
+    isDown = true;
+    offsetX = e.clientX - el.getBoundingClientRect().left;
+    offsetY = e.clientY - el.getBoundingClientRect().top;
+    el.style.transition = "none"; // avoid floaty animation while dragging
+    document.addEventListener("mousemove", onMouseMove);
+    document.addEventListener("mouseup", onMouseUp);
+  };
+
+  const onMouseMove = (e) => {
+    if (!isDown) return;
+    el.style.left = (e.clientX - offsetX) + "px";
+    el.style.top = (e.clientY - offsetY) + "px";
+  };
+
+  const onMouseUp = () => {
+    isDown = false;
+    el.style.transition = ""; // restore transitions
+    document.removeEventListener("mousemove", onMouseMove);
+    document.removeEventListener("mouseup", onMouseUp);
+  };
+
+  // You can change this to el.querySelector('.random-popup__header') if you only want the header draggable
+  el.addEventListener("mousedown", onMouseDown);
+}
+
+// ✅ Show a jumpscare using your PNG
+function triggerJumpScare() {
+  const scare = document.createElement("div");
+  scare.className = "jumpscare";
+
+  // ✅ CHANGE THIS TO YOUR PNG FILE
+  scare.innerHTML = `<img src="adobe_evil.PNG" alt="">`;
+
+  document.body.appendChild(scare);
+
+  // Remove after 1 second
+  setTimeout(() => scare.remove(), 1000);
+}
+// ✅ Add your PNGs here
+const CAMERA_REVEAL_IMAGES = [
+  "DSC_01.JPG",
+  "DSC_02.JPG",
+  "DSC_03.JPG",
+  "DSC_04.JPG",
+];
+// ===============================
+// ✅ CAMERA EVENT SYSTEM
+// ===============================
+
+// A small camera icon will appear rarely.
+// Clicking it will flash the screen & show a random image.
+
+function spawnCameraEvent() {
+  // 1/120 chance every cycle (adjustable)
+  if (Math.random() > 0.0083) return; // ~1/120 ≈ rare
+
+const cam = document.createElement("div");
+  cam.className = "camera-popup";
+  cam.textContent = "📸"; // ✅ CAMERA EMOJI
+
+  // place it on one of the 4 edges
+  const side = ["left","right","top","bottom"][Math.floor(Math.random()*4)];
+  const offset = Math.random() * 70 + "vh";
+
+  if (side === "left") {
+    cam.style.left = "10px";
+    cam.style.top = offset;
+  }
+  if (side === "right") {
+    cam.style.right = "10px";
+    cam.style.top = offset;
+  }
+  if (side === "top") {
+    cam.style.top = "10px";
+    cam.style.left = offset;
+  }
+  if (side === "bottom") {
+    cam.style.bottom = "10px";
+    cam.style.left = offset;
+  }
+
+  document.body.appendChild(cam);
+
+  // ✅ Click behavior
+  cam.addEventListener("click", () => {
+    // flash
+    const flash = document.createElement("div");
+    flash.className = "screen-flash";
+    document.body.appendChild(flash);
+
+    // pick random image
+    const reveal = document.createElement("div");
+    reveal.className = "reveal-image";
+
+    const img = document.createElement("img");
+    img.src = CAMERA_REVEAL_IMAGES[Math.floor(Math.random() * CAMERA_REVEAL_IMAGES.length)];
+    reveal.appendChild(img);
+
+    document.body.appendChild(reveal);
+
+    setTimeout(() => {
+      flash.remove();
+      reveal.remove();
+    }, 3200);
+
+    cam.remove();
+  });
+
+  // auto-remove after 8 seconds if not clicked
+  setTimeout(() => cam.remove(), 8000);
+}
+
+// ✅ Call camera spawn occasionally
+setInterval(spawnCameraEvent, 90); // check every second

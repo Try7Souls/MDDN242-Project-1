@@ -407,7 +407,7 @@
     wireShortcuts();
 
     setInterval(() => {
-      if (Math.random() < 0.010) triggerJumpScare();
+      if (Math.random() < 0.000) triggerJumpScare();
     }, 1000);
 
     if (!prefersReduced) {

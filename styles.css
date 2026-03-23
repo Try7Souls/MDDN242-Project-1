@@ -21,6 +21,7 @@ body {
     1px 0 0 rgba(255,0,0,0.6),
     -1px 0 0 rgba(0,255,255,0.6);
   animation: titleJitter 2.8s ease-in-out infinite;
+  user-select: none;
 }
 @keyframes titleJitter {
   0%, 100% { transform: translate(0,0) rotate(0deg); }
@@ -62,7 +63,7 @@ body {
   position: fixed;
   inset: 0;
   /* We need clicks for About Me and popups */
-  pointer-events: auto;
+  pointer-events: none;
   overflow: hidden;
   z-index: 999;
 }
@@ -77,7 +78,7 @@ body {
   mix-blend-mode: normal; /* randomized in JS */
   will-change: transform, opacity, left, top;
   /* Default: chaos items shouldn't intercept clicks */
-  pointer-events: none;
+  pointer-events: auto;
 }
 .chaos-item.shape { font-size: 0; line-height: 0; }
 
@@ -156,88 +157,215 @@ body {
   .chaos-item { animation: none !important; transition: none !important; filter: none !important; }
   .title, .underline { animation: none !important; }
 }
-/* ✅ Jumpscare overlay */
-.jumpscare {
-  position: fixed;
-  inset: 0;
-  background: black;
-  z-index: 999999;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  pointer-events: none;
+/* ---- Popup Exit Animations ---- */
+
+/* Fade out quickly */
+.popup-exit-fade {
+  animation: popupFadeOut 280ms ease forwards;
+}
+@keyframes popupFadeOut {
+  to { opacity: 0; transform: scale(0.85); }
 }
 
-.jumpscare img {
-  width: 200vmin;
-  height: auto;
-  animation: jumpscareFlash 0.05s steps(2) infinite;
+/* Slide down while fading */
+.popup-exit-slide {
+  animation: popupSlideOut 320ms ease forwards;
+}
+@keyframes popupSlideOut {
+  to { transform: translateY(40px); opacity: 0; }
 }
 
-/* ------------------------------------
-   ✅ CAMERA EVENT SYSTEM
------------------------------------- */
-#cameraEventLayer {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 9000;
+/* Spin + shrink */
+.popup-exit-spin {
+  animation: popupSpinOut 360ms ease forwards;
+}
+@keyframes popupSpinOut {
+  to { transform: rotate(35deg) scale(0); opacity: 0; }
 }
 
-/* The camera icon that appears */
-.camera-popup {
+/* Drop like gravity */
+.popup-exit-drop {
+  animation: popupDropOut 420ms cubic-bezier(.6,2,.4,1) forwards;
+}
+@keyframes popupDropOut {
+  to { transform: translateY(220px) rotate(12deg); opacity: 0; }
+}
+
+/* Flip backwards */
+.popup-exit-flip {
+  animation: popupFlipOut 380ms ease forwards;
+}
+@keyframes popupFlipOut {
+  to { transform: rotateX(90deg); opacity: 0; }
+}
+
+/* ------------------ COOL POPUP EXITS ------------------ */
+
+/* 1. Glitch dissolve */
+.popup-exit-glitch {
+  animation: popupGlitchOut 350ms steps(10) forwards;
+}
+@keyframes popupGlitchOut {
+  0%   { opacity: 1; transform: none; }
+  20%  { transform: skewX(8deg); clip-path: inset(0 0 30% 0); }
+  40%  { transform: skewX(-8deg); clip-path: inset(40% 0 0 0); }
+  60%  { transform: translate(-6px, 2px); opacity: .6; }
+  100% { transform: scale(.7) skewX(10deg); opacity: 0; }
+}
+
+/* 2. Pixel melt */
+.popup-exit-pixel {
+  animation: popupPixelOut 450ms ease-out forwards;
+}
+@keyframes popupPixelOut {
+  0% { filter: none; opacity: 1; }
+  60% { filter: blur(3px) brightness(150%); }
+  100% { opacity: 0; filter: blur(18px); transform: scale(1.2); }
+}
+
+/* 3. Black hole collapse */
+.popup-exit-blackhole {
+  animation: popupBlackHoleOut 420ms cubic-bezier(.3,.6,.4,1.4) forwards;
+}
+@keyframes popupBlackHoleOut {
+  0% { transform: scale(1); opacity: 1; }
+  70% { transform: scale(0.25) rotate(35deg); opacity: .5; }
+  100% { transform: scale(0) rotate(90deg); opacity: 0; }
+}
+
+/* 4. Burn-away */
+.popup-exit-burn {
+  animation: popupBurnOut 600ms ease-out forwards;
+}
+@keyframes popupBurnOut {
+  0% { filter: none; opacity: 1; }
+  40% { filter: grayscale(70%) brightness(170%); }
+  70% { filter: grayscale(80%) blur(2px); }
+  100% { opacity: 0; filter: blur(12px); transform: scale(.85); }
+}
+
+/* 5. Implosion */
+.popup-exit-implode {
+  animation: popupImplode 320ms cubic-bezier(.4,1.6,.4,1) forwards;
+}
+@keyframes popupImplode {
+  0% { transform: scale(1); opacity: 1; }
+  100% { transform: scale(0); opacity: 0; }
+}
+
+/* 6. Vortex spin */
+.popup-exit-vortex {
+  animation: popupVortex 480ms ease-in forwards;
+}
+@keyframes popupVortex {
+  0%   { transform: scale(1) rotate(0); opacity: 1; }
+  80%  { transform: scale(0.4) rotate(200deg); opacity: .4; }
+  100% { transform: scale(0) rotate(360deg); opacity: 0; }
+}
+
+/* Car folder button (bottom-left) */
+.car-folder {
   position: fixed;
-  font-size: 128px;
-  width: 140px;
-  height: 140px;
+  bottom: 20px;
+  left: 20px;
+  padding: 10px 16px;
+  background: #222;
+  color: #fff;
+  border-radius: 8px;
+  font-weight: 700;
   cursor: pointer;
+  z-index: 2000;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.35);
+  user-select: none;
+  transition: transform .15s ease;
+}
+
+.car-folder:hover {
+  transform: scale(1.06);
+}
+
+/* Car images (spawned chaos objects) */
+.car-chaos {
+  position: absolute;
+  max-width: 360px;
+  max-height: 600px;
+  border-radius: 8px;
   pointer-events: auto;
-  z-index: 9998;
-  transition: 0.25s ease;
-  filter: drop-shadow(0 6px 12px rgba(0,0,0,0.4));
-  animation: cameraPulse 1.4s ease-in-out infinite
+  cursor: pointer;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.35);
+  will-change: transform, opacity, left, top;
+  transition: opacity .12s ease, transform .12s ease;
 }
 
-/* Flash effect */
-.screen-flash {
+/* Chaotic car destruction animation */
+@keyframes carExplode {
+  0%   { transform: scale(1) rotate(0);     opacity: 1;   filter: none; }
+  30%  { transform: scale(1.4) rotate(40deg); opacity: .85; filter: contrast(150%); }
+  60%  { transform: scale(.7) rotate(200deg); opacity: .5;  filter: blur(4px); }
+  100% { transform: scale(0) rotate(720deg); opacity: 0;   filter: blur(14px); }
+}
+
+.car-destroy {
+  animation: carExplode 650ms ease forwards;
+}
+
+/* ----- REALISTIC FOLDER ICON ----- */
+.car-folder {
   position: fixed;
-  inset: 0;
-  background: white;
-  opacity: 1;
-  z-index: 99999;
-  pointer-events: none;
-  animation: flashFade 0.6s ease-out forwards;
+  width: 90px;
+  height: 70px;
+  opacity: 0;
+  transform: scale(0.7);
+  pointer-events: auto;
+  z-index: 2000;
+  cursor: pointer;
 }
 
-@keyframes flashFade {
-  0% { opacity: 1; }
-  100% { opacity: 0; }
+.car-folder:hover {
+  transform: scale(1.08);
 }
 
-/* Image shown after clicking the camera */
-.reveal-image {
-  position: fixed;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 99995;
-  pointer-events: none;
-  animation: revealFade 3s ease-out forwards;
+/* Folder shape */
+.folder-icon {
+  position: relative;
+  width: 100%;
+  height: 100%;
 }
 
-.reveal-image img {
-  max-width: 80vw;
-  max-height: 80vh;
+.folder-tab {
+  position: absolute;
+  top: 0;
+  left: 8px;
+  width: 55px;
+  height: 22px;
+  background: #ffda7a;
+  border-radius: 6px 6px 0 0;
+  box-shadow: inset 0 -3px 5px rgba(0,0,0,0.12);
 }
 
-@keyframes revealFade {
-  0% { opacity: 1; }
-  95% { opacity: 1; }
-  100% { opacity: 0; }
+.folder-body {
+  position: absolute;
+  top: 16px;
+  left: 0;
+  width: 100%;
+  height: 54px;
+  background: #fbc746;
+  border-radius: 6px;
+  box-shadow:
+    inset 0 -4px 6px rgba(0,0,0,0.15),
+    0 6px 16px rgba(0,0,0,0.25);
 }
-@keyframes cameraPulse {
-  0%   { transform: scale(1); }
-  50%  { transform: scale(1.14); }
-  100% { transform: scale(1); }
+
+/* Car badge on the folder */
+.folder-car {
+  position: absolute;
+  right: -8px;
+  bottom: -4px;
+  font-size: 24px;
+  transform: rotate(-8deg);
+  text-shadow: 0 3px 6px rgba(0,0,0,0.25);
+}
+.car-chaos {
+    position: absolute;
+    z-index: 1000; /* higher than shapes/words, lower than popups */
 }

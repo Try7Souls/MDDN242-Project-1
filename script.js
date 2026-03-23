@@ -1,4 +1,7 @@
 (function () {
+
+let folderVisible = false;
+
   const pick = arr => arr[Math.floor(Math.random() * arr.length)];
   const rand = (min, max) => Math.random() * (max - min) + min;
   const randInt = (min, max) => Math.floor(rand(min, max + 1));
@@ -152,9 +155,95 @@
 
     const item = { el, x, y, w: r.width, h: r.height, vx, vy, type, static: type === "popup" };
     items.push(item);
+    // ✅ Click to shatter
+el.addEventListener("click", () => {
+    if (type === "chaos") shatterItem(item);
+});
     return item;
   }
 
+  const carImages = [
+  "DSC_01.jpg",
+  "DSC_02.jpg",
+  "DSC_03.jpg",
+  "DSC_04.jpg",
+  "DSC_05.jpg",
+  "DSC_06.jpg",
+  "DSC_07.jpg",
+  "DSC_08.jpg",
+  "DSC_09.jpg"
+];
+``
+function spawnCarChaos() {
+// how many car images to spawn
+const num = randInt(3, 9);
+const { w: bw, h: bh } = bounds();
+
+// ✅ make a shuffled copy of your carImages list
+let available = [...carImages].sort(() => Math.random() - 0.5);
+
+for (let i = 0; i < num; i++) {
+
+  // ✅ if we run out of unique images, reshuffle the list
+  if (available.length === 0) {
+    available = [...carImages].sort(() => Math.random() - 0.5);
+  }
+
+  // ✅ pull a unique image
+  const uniqueImg = available.pop();
+
+  const img = document.createElement("img");
+  img.src = uniqueImg;
+  img.className = "car-chaos chaos-item";
+
+  const size = randInt(360, 600);
+  img.style.width = size + "px";
+
+  const x = rand(0, bw - size);
+  const y = rand(0, bh - size);
+
+  img.style.left = x + "px";
+  img.style.top = y + "px";
+
+  const angle = rand(0, Math.PI * 2);
+  const speed = rand(140, 320);
+
+  const item = {
+    el: img,
+    x,
+    y,
+    w: size,
+    h: size,
+    vx: Math.cos(angle) * speed,
+    vy: Math.sin(angle) * speed,
+    type: "car"
+  };
+
+  img.addEventListener("click", () => destroyCar(item));
+
+  layer.appendChild(img);
+  items.push(item);
+
+  // spawn animation
+  img.style.opacity = "0";
+  img.style.transform = "scale(0.8)";
+  requestAnimationFrame(() => {
+    img.style.opacity = "1";
+    img.style.transform = "scale(1)";
+  });
+}
+}
+function destroyCar(item) {
+  if (!item.el) return;
+
+  const el = item.el;
+  el.classList.add("car-destroy");
+
+  setTimeout(() => {
+    el.remove();
+    items = items.filter(i => i !== item);
+  }, 700);
+}
   function populateChaos(count) {
     items.forEach(i => {
       if (i.type === "chaos") {
@@ -227,6 +316,9 @@
     box.appendChild(body);
     document.body.appendChild(box);
 
+// ✅ Make the "Too Many Windows" popup draggable
+makeDraggable(box);
+
     box.style.left = "calc(50% - 110px)";
     box.style.top = "calc(50% - 110px)";
     box.style.opacity = "0";
@@ -238,6 +330,7 @@
       box.style.transform = "scale(1)";
     });
   }
+
 
   function spawnRandomPopup() {
     if (prefersReduced) return;
@@ -258,10 +351,30 @@
     close.className = "random-popup__close";
     close.textContent = "×";
 
-    close.addEventListener("click", () => {
-      box.remove();
-      items = items.filter(i => i.el !== box);
-    });
+   close.addEventListener("click", () => {
+const exits = [
+  "popup-exit-fade",
+  "popup-exit-slide",
+  "popup-exit-spin",
+  "popup-exit-drop",
+  "popup-exit-flip",
+  "popup-exit-glitch",
+  "popup-exit-pixel",
+  "popup-exit-blackhole",
+  "popup-exit-burn",
+  "popup-exit-implode",
+  "popup-exit-vortex"
+];
+
+  const chosen = exits[Math.floor(Math.random() * exits.length)];
+  box.classList.add(chosen);
+
+  // Remove AFTER animation finishes
+  setTimeout(() => {
+    box.remove();
+    items = items.filter(i => i.el !== box);
+  }, 500); // slight buffer over longest animation
+});
 
     box.append(header, close, body);
     document.body.appendChild(box);
@@ -401,20 +514,170 @@
     items = items.filter(i => i.type !== "chaos");
   }
 
-  document.addEventListener("DOMContentLoaded", () => {
-    randomizeMainCopy();
-    populateChaos(randInt(CHAOS_MIN, CHAOS_MAX));
-    wireShortcuts();
+  function titleConfettiBurst(x, y) {
+  const count = 18;
+  for (let i = 0; i < count; i++) {
+    const piece = document.createElement("div");
+    piece.textContent = "◆"; // you can change this to any symbol
+    piece.style.position = "fixed";
+    piece.style.left = x + "px";
+    piece.style.top = y + "px";
+    piece.style.fontSize = randInt(8, 16) + "px";
+    piece.style.color = randomColor();
+    piece.style.pointerEvents = "none";
+    piece.style.zIndex = 99999;
+    document.body.appendChild(piece);
 
-    setInterval(() => {
-      if (Math.random() < 0.000) triggerJumpScare();
-    }, 1000);
+    const angle = rand(-Math.PI/2 - 0.8, -Math.PI/2 + 0.8);
+    const speed = rand(80, 180);
+    const vx = Math.cos(angle) * speed;
+    const vy = Math.sin(angle) * speed;
 
-    if (!prefersReduced) {
-      queueNextPopup();
-      requestAnimationFrame(step);
+    const start = performance.now();
+    const life = randInt(600, 900);
+
+    function anim(t) {
+      let p = (t - start) / life;
+      if (p >= 1) { piece.remove(); return; }
+
+      piece.style.left = x + vx * p + "px";
+      piece.style.top  = y + vy * p + "px";
+      piece.style.opacity = 1 - p;
+
+      requestAnimationFrame(anim);
     }
+    requestAnimationFrame(anim);
+  }
+}
+  
+  document.addEventListener("DOMContentLoaded", () => {
+
+  const folder = document.getElementById("carFolder");
+
+  // Spawn the folder at a random position
+  function spawnFolderRandom() {
+    if (folderVisible) return; // prevent duplicates
+    folderVisible = true;
+
+    const { w: bw, h: bh } = bounds();
+
+    const folderW = 90;
+    const folderH = 70;
+
+    // random position (slight bias to bottom-left area)
+    const x = randInt(10, bw * 0.3);
+    const y = randInt(bh * 0.55, bh - folderH - 20);
+
+    folder.style.left = x + "px";
+    folder.style.top = y + "px";
+
+    // fade in
+    folder.style.opacity = "1";
+    folder.style.transform = "scale(1)";
+  }
+
+  // Hide the folder after clicking it
+  function hideFolder() {
+    folderVisible = false;
+
+    folder.style.opacity = "0";
+    folder.style.transform = "scale(0.6)";
+
+    // visually hide after animation
+    setTimeout(() => {
+      folder.style.left = "-9999px";
+    }, 200);
+  }
+
+  // CLICK — hide folder + spawn cars
+  folder.addEventListener("click", () => {
+    hideFolder();
+    spawnCarChaos();
+    queueNextFolderSpawn(); // start countdown to next spawn
   });
+
+  // Random spawn timer (keeps repeating)
+  function queueNextFolderSpawn() {
+    const delay = randInt(8000, 22000);  // 8–22 seconds
+    setTimeout(() => {
+      spawnFolderRandom();
+      queueNextFolderSpawn(); // keep looping forever
+    }, delay);
+  }
+
+  // FIRST SPAWN
+
+  queueNextFolderSpawn();
+
+  // your existing startup logic:
+  const title = document.querySelector(".title");
+  title.addEventListener("click", e => {
+    titleConfettiBurst(e.clientX, e.clientY);
+  });
+
+  randomizeMainCopy();
+  populateChaos(randInt(CHAOS_MIN, CHAOS_MAX));
+  wireShortcuts();
+
+  if (!prefersReduced) {
+    queueNextPopup();
+    requestAnimationFrame(step);
+  }
+});
+
+function shatterItem(item) {
+    if (!item.el || !item.el.parentNode) return;
+
+    const parent = item.el.parentNode;
+    const baseX = item.x;
+    const baseY = item.y;
+
+    const count = randInt(6, 14);
+
+    for (let i = 0; i < count; i++) {
+        const shard = item.el.cloneNode(true);
+        shard.style.position = "absolute";
+        shard.style.pointerEvents = "none";
+        shard.style.opacity = "1";
+        shard.style.transform = "scale(0.35)";
+
+        parent.appendChild(shard);
+
+        shard.style.left = baseX + "px";
+        shard.style.top  = baseY + "px";
+
+        const angle = rand(0, Math.PI * 2);
+        const speed = rand(120, 420);
+
+        const vx = Math.cos(angle) * speed;
+        const vy = Math.sin(angle) * speed;
+
+        const lifetime = randInt(300, 700);
+        const startTime = performance.now();
+
+        function animateShard(t) {
+            const progress = (t - startTime) / lifetime;
+
+            if (progress >= 1) {
+                shard.remove();
+                return;
+            }
+
+            shard.style.left = baseX + vx * progress + "px";
+            shard.style.top  = baseY + vy * progress + "px";
+            shard.style.opacity = (1 - progress).toString();
+            shard.style.transform = `scale(${0.35 - progress * 0.3}) rotate(${progress * 720}deg)`;
+
+            requestAnimationFrame(animateShard);
+        }
+
+        requestAnimationFrame(animateShard);
+    }
+
+    // Remove original
+    item.el.remove();
+    items = items.filter(i => i !== item);
+}
 
   let rAF = null;
   window.addEventListener("resize", () => {
@@ -457,64 +720,3 @@ function makeDraggable(el) {
   el.addEventListener("mousedown", onMouseDown);
 }
 
-// ✅ JUMPSCARE
-function triggerJumpScare() {
-  const scare = document.createElement("div");
-  scare.className = "jumpscare";
-  scare.innerHTML = `<img src="adobe_evil.PNG" alt="">`;
-  document.body.appendChild(scare);
-  setTimeout(() => scare.remove(), 1000);
-}
-
-// ✅ CAMERA IMAGES
-const CAMERA_REVEAL_IMAGES = [
-  "DSC_01.JPG",
-  "DSC_02.JPG",
-  "DSC_03.JPG",
-  "DSC_04.JPG",
-];
-
-// ✅ CAMERA EVENT
-function spawnCameraEvent() {
-  if (Math.random() > 0.006) return;
-
-  const cam = document.createElement("div");
-  cam.className = "camera-popup";
-  cam.textContent = "📸";
-
-  const side = ["left","right","top","bottom"][Math.floor(Math.random()*4)];
-  const offset = Math.random()*70 + "vh";
-
-  if (side === "left") { cam.style.left="10px"; cam.style.top=offset; }
-  if (side === "right") { cam.style.right="10px"; cam.style.top=offset; }
-  if (side === "top") { cam.style.top="10px"; cam.style.left=offset; }
-  if (side === "bottom") { cam.style.bottom="10px"; cam.style.left=offset; }
-
-  document.body.appendChild(cam);
-
-  cam.addEventListener("click", () => {
-    const flash = document.createElement("div");
-    flash.className = "screen-flash";
-    document.body.appendChild(flash);
-
-    const reveal = document.createElement("div");
-    reveal.className = "reveal-image";
-
-    const img = document.createElement("img");
-    img.src = CAMERA_REVEAL_IMAGES[Math.floor(Math.random() * CAMERA_REVEAL_IMAGES.length)];
-    reveal.appendChild(img);
-
-    document.body.appendChild(reveal);
-
-    setTimeout(() => {
-      flash.remove();
-      reveal.remove();
-    }, 3200);
-
-    cam.remove();
-  });
-
-  setTimeout(() => cam.remove(), 8000);
-}
-
-setInterval(spawnCameraEvent, 90);

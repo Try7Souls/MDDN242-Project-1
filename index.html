@@ -9,9 +9,6 @@
   <!-- Styles -->
   <link rel="stylesheet" href="styles.css" />
 
-  <!-- Camera event layer -->
-<div id="cameraEventLayer"></div>
-
   <style>
     /* Accessibility helper for keyboard users */
     :focus-visible {
@@ -27,7 +24,9 @@
     }
   </style>
 </head>
+
 <body>
+
 
   <header>
     <h1 class="title">Basic Website!</h1>
@@ -38,10 +37,22 @@
     <div class="underline" aria-hidden="true"></div>
   </main>
 
+
   <!-- CHAOS overlay (clickable 'About Me' needs pointer-events enabled selectively) -->
   <div class="chaos-layer" id="chaosLayer" aria-hidden="true"></div>
 
   <!-- Logic -->
   <script src="script.js"></script>
+
+<!-- CAR FOLDER (spawned randomly by JS) -->
+<div id="carFolder" class="car-folder">
+  <div class="folder-icon">
+    <div class="folder-tab"></div>
+    <div class="folder-body"></div>
+    <div class="folder-car">🚗</div>
+  </div>
+</div>
+
 </body>
 </html>
+

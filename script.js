@@ -1,15 +1,14 @@
 (function () {
 
 let folderVisible = false;
-
   const pick = arr => arr[Math.floor(Math.random() * arr.length)];
   const rand = (min, max) => Math.random() * (max - min) + min;
   const randInt = (min, max) => Math.floor(rand(min, max + 1));
   const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   // === Config (DENSER + FASTER) ===
-  const CHAOS_MIN = 64;
-  const CHAOS_MAX = 120;
+  const CHAOS_MIN = 40;
+  const CHAOS_MAX = 100;
   const SPEED_MIN = 180;
   const SPEED_MAX = 420;
 
@@ -661,7 +660,7 @@ function shatterItem(item) {
     const baseX = item.x;
     const baseY = item.y;
 
-    const count = randInt(6, 14);
+    const count = randInt(4, 7);
 
     for (let i = 0; i < count; i++) {
         const shard = item.el.cloneNode(true);

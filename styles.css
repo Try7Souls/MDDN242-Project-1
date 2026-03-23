@@ -68,7 +68,7 @@ body {
   z-index: 999;
 }
 
-/* Chaos items (moved with JS physics) */
+/* Chaos items */
 .chaos-item {
   position: absolute;
   white-space: nowrap;
@@ -86,7 +86,7 @@ body {
 .about-item {
   pointer-events: auto;        /* allow clicks */
   cursor: pointer;
-  z-index: 1002;               /* above other chaos items */
+  z-index: 1002;               
   color: #0b132b;
   background: #f5fbff;
   border: 2px solid #cbe6ff;
@@ -121,7 +121,7 @@ body {
     0 10px 26px rgba(0,0,0,0.25),
     0 2px 8px rgba(0,0,0,0.18),
     0 0 0 6px rgba(147,112,219,0.08);
-  z-index: 1001; /* above chaos, below About Me */
+  z-index: 1001; 
   overflow: hidden;
   pointer-events: auto;
   user-select: none;
@@ -367,5 +367,62 @@ body {
 }
 .car-chaos {
     position: absolute;
-    z-index: 1000; /* higher than shapes/words, lower than popups */
+    z-index: 1000;
+}
+
+.popup-image-wrap {
+  width: 100%;
+  height: calc(100% - 90px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #ffffff; 
+  overflow: hidden;
+}
+
+.popup-art {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+  display: block;
+}
+
+/* === RANDOM POPUP IMAGE ANIMATIONS === */
+
+@keyframes popupImgPulse {
+  0%,100% { transform: scale(1); }
+  50%     { transform: scale(1.08); }
+}
+
+@keyframes popupImgFloat {
+  0%   { transform: translateY(0); }
+  50%  { transform: translateY(-6px); }
+  100% { transform: translateY(0); }
+}
+
+@keyframes popupImgSpin {
+  0%   { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes popupImgTilt {
+  0%   { transform: rotate(-3deg); }
+  50%  { transform: rotate(3deg); }
+  100% { transform: rotate(-3deg); }
+}
+
+@keyframes popupImgFadeShift {
+  0%   { opacity: 0.6; transform: translateX(-4px); }
+  50%  { opacity: 1;   transform: translateX(4px); }
+  100% { opacity: 0.6; transform: translateX(-4px); }
+}
+
+/* base popup image styling */
+.popup-art {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  pointer-events: none;   /* keeps popup draggable! */
+  display: block;
 }

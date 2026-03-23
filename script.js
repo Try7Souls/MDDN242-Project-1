@@ -163,17 +163,27 @@ el.addEventListener("click", () => {
   }
 
   const carImages = [
-  "DSC_01.jpg",
-  "DSC_02.jpg",
-  "DSC_03.jpg",
-  "DSC_04.jpg",
-  "DSC_05.jpg",
-  "DSC_06.jpg",
-  "DSC_07.jpg",
-  "DSC_08.jpg",
-  "DSC_09.jpg"
+  "cars/DSC_01.jpg",
+  "cars/DSC_02.jpg",
+  "cars/DSC_03.jpg",
+  "cars/DSC_04.jpg",
+  "cars/DSC_05.jpg",
+  "cars/DSC_06.jpg",
+  "cars/DSC_07.jpg",
+  "cars/DSC_08.jpg",
+  "cars/DSC_09.jpg"
 ];
 ``
+const popupImages = [
+  "illustrator/adobe_01.jpg",
+  "illustrator/adobe_02.jpg",
+  "illustrator/adobe_03.jpg",
+  "illustrator/adobe_04.jpg",
+  "illustrator/adobe_05.jpg",
+  "illustrator/adobe_06.jpg",
+  "illustrator/adobe_07.jpg"
+];
+
 function spawnCarChaos() {
 // how many car images to spawn
 const num = randInt(3, 9);
@@ -233,6 +243,7 @@ for (let i = 0; i < num; i++) {
   });
 }
 }
+
 function destroyCar(item) {
   if (!item.el) return;
 
@@ -331,7 +342,6 @@ makeDraggable(box);
     });
   }
 
-
   function spawnRandomPopup() {
     if (prefersReduced) return;
 
@@ -346,6 +356,22 @@ makeDraggable(box);
     const body = document.createElement("div");
     body.className = "random-popup__body";
     body.textContent = pick(["Chaos likes you.","Edges are bouncy.","Physics engaged.","Maximum wiggle.","Entropy rising."]);
+
+    // ✅ Add a random image below the text
+const img = document.createElement("img");
+img.className = "popup-art";
+img.src = pick(popupImages);
+
+// ✅ Random animation for popup image
+const imgAnims = [
+  "popupImgPulse 2.4s ease-in-out infinite",
+  "popupImgFloat 3s ease-in-out infinite",
+  "popupImgSpin 6s linear infinite",
+  "popupImgTilt 2.2s ease-in-out infinite",
+  "popupImgFadeShift 2.8s ease-in-out infinite"
+];
+
+img.style.animation = pick(imgAnims);
 
     const close = document.createElement("button");
     close.className = "random-popup__close";
@@ -376,7 +402,11 @@ const exits = [
   }, 500); // slight buffer over longest animation
 });
 
-    box.append(header, close, body);
+    const imgWrap = document.createElement("div");
+imgWrap.className = "popup-image-wrap";
+imgWrap.appendChild(img);
+
+box.append(header, close, body, imgWrap);
     document.body.appendChild(box);
     makeDraggable(box);
 
@@ -606,7 +636,6 @@ const exits = [
   }
 
   // FIRST SPAWN
-
   queueNextFolderSpawn();
 
   // your existing startup logic:

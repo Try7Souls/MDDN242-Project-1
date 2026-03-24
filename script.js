@@ -81,7 +81,7 @@ let folderVisible = false;
       el.style.borderRadius = Math.random() < 0.5 ? rand(4,18) + "px" : "0";
     }
 
-    if (Math.random() < 0.15)
+    if (Math.random() < 0.14)
       el.style.mixBlendMode = pick(["multiply","screen","overlay","difference","hard-light"]);
 
     const fx = [];

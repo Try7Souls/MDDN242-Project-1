@@ -8,7 +8,7 @@ let folderVisible = false;
 
   // === Config (DENSER + FASTER) ===
   const CHAOS_MIN = 30;
-  const CHAOS_MAX = 80;
+  const CHAOS_MAX = 100;
   const SPEED_MIN = 180;
   const SPEED_MAX = 420;
 
@@ -81,7 +81,7 @@ let folderVisible = false;
       el.style.borderRadius = Math.random() < 0.5 ? rand(4,18) + "px" : "0";
     }
 
-    if (Math.random() < 0.08)
+    if (Math.random() < 0.15)
       el.style.mixBlendMode = pick(["multiply","screen","overlay","difference","hard-light"]);
 
     const fx = [];

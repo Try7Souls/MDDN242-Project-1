@@ -7,8 +7,8 @@ let folderVisible = false;
   const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   // === Config (DENSER + FASTER) ===
-  const CHAOS_MIN = 40;
-  const CHAOS_MAX = 100;
+  const CHAOS_MIN = 30;
+  const CHAOS_MAX = 80;
   const SPEED_MIN = 180;
   const SPEED_MAX = 420;
 
@@ -81,7 +81,7 @@ let folderVisible = false;
       el.style.borderRadius = Math.random() < 0.5 ? rand(4,18) + "px" : "0";
     }
 
-    if (Math.random() < 0.25)
+    if (Math.random() < 0.08)
       el.style.mixBlendMode = pick(["multiply","screen","overlay","difference","hard-light"]);
 
     const fx = [];
@@ -205,7 +205,7 @@ for (let i = 0; i < num; i++) {
   img.src = uniqueImg;
   img.className = "car-chaos chaos-item";
 
-  const size = randInt(360, 600);
+  const size = randInt(280, 420);
   img.style.width = size + "px";
 
   const x = rand(0, bw - size);
